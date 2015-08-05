@@ -10,8 +10,9 @@ from scipy import optimize
 import math
 
 #initialize number of classes required
-n = 3.0
-x = float(1/n)
+n = 3
+n1 = float(n)
+x = float(1/n1)
 #the following arrays are random arrays used to test the function
 Pyhy = np.random.rand(n,n)
 Pyh = np.random.rand(n,1)
