@@ -9,82 +9,83 @@ import numpy as np
 from scipy import optimize
 import math
 
-#initialize variables and numpy arrays
-j = 0
-i = 0
-c = 0
-n = 3
-r = 0
-Pyhy = np.zeros((n,n))
-Pyh = np.zeros((n,1))
-Py = np.zeros((n,1))
+#initialize number of classes required
+n = 3.0
+x = float(1/n)
+#the following arrays are random arrays used to test the function
+Pyhy = np.random.rand(n,n)
+Pyh = np.random.rand(n,1)
+Py = np.array((x,1))
 
-Py[j] = 1/n
+print Pyhy
+print Pyh
+print Py
+print x
+
+#alternatively, the arrays can be configured into arrays of zeros using
+#Pyhy = np.zeros((n,n))
+#Pyh = np.zeros((n,1))
+#Py = np.zeros((n,1))
+
+#plot show is used to test whether the arrays are in a desirable format
+'''plt.imshow(Pyhy, interpolation= 'nearest')
+plt.show()
+
+plt.imshow(Pyh, interpolation= 'nearest')
+plt.show()
+
+plt.imshow(Py, interpolation= 'nearest')
+plt.show()'''
 
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(n, Pyhy, Py):
     for i in range(n):
         for j in range(n):
+            global Pyh
             Pyh[i] = Pyh[i] + Py[j]*Pyhy[i,j]
-            return Pyh[i]
         j = j+1
     i = i + 1
     return Pyh
 
-#calculate c given Pyhy, Py, Pyh
-def f(Pyhy, Py, Pyh):
-    c = Pyhy[i,j]*Py[j]*math.log(Pyhy[i,j]/Pyh[i], 2)
-    return c
+#plt.imshow(Pyh, interpolation='nearest')
+#plt.show()
 
-#calculate the capacity with a summation with a nested "for" loop inside another "for" loop
-c1 = 0
-def cap(Pyhy):
+#calculate c given Pyhy, Py, Pyh
+
+def chCap(Pyhy):
+    chCap1 = 0
     for i in range(n):
         for j in range(n):
-            c1 = c + f(Pyhy, Py, Pyh)
-            if Pyh[i] > 0: 
-                return c
-            else:
-                pass
-            j = j + 1
-        i = i + 1
-    return c
+            c = Pyhy[i,j]*Py[j]*math.log(Pyhy[i,j]/Pyh[i], 2)
+            chCap1 = chCap1 + c
+        j = j + 1
+    i = i + 1
+    print chCap1
+
+chCap(Pyhy)
 
 
-#Set the constraints on the function "cap"
+'''
+
+#Set the constraints on the function "cap" - still in progress
 cons = ({'type': 'eq',
-          'fun' : lambda x: np.array(n*Py - 1),
+          'fun' : lambda x: np.array(n*Py - 1)
           },
-          
         {'type': 'ineq',
-          'fun' : lambda x: np.array([]),
+          'fun' : lambda x: np.array()
           },
-          
-        {'type': 'ineq',
-          'fun' : lambda x: np.array([]),
+         {'type': 'eq',
+          'fun' : lambda x: np.array()
+          },
+         {'type': 'ineq',
+          'fun' : lambda x: np.array()
           })
-          
-result = optimize.minimize(cap, [],
+
+#minimize the function
+result = optimize.minimize(cap, [0.0,1,0],
          constraints=cons, method='SLSQP', options={'disp': True})
         
-print result
-        
-            
-            
-            
-            
-        
-        
-    
-    
-    
-        
-        
-        
-
-
-        
-        
+print result'''
 
     
 
