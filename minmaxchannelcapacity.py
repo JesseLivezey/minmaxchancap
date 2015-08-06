@@ -1,9 +1,7 @@
 #! /usr/bin/python
+#Copyright Amrith Krishnan 2015
 
-# To change this license header, choose License Headers in Project Properties.
-# To change this template file, choose Tools | Templates
-# and open the template in the editor.
-
+#import libraries
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy import optimize
@@ -18,15 +16,10 @@ Pyhy = np.random.rand(n,n)
 Pyh = np.random.rand(n,1)
 Py = np.array((x,1))
 
-print Pyhy
-print Pyh
-print Py
-print x
-
 #alternatively, the arrays can be configured into arrays of zeros using
-#Pyhy = np.zeros((n,n))
-#Pyh = np.zeros((n,1))
-#Py = np.zeros((n,1))
+'''Pyhy = np.zeros((n,n))
+Pyh = np.zeros((n,1))
+Py = np.zeros((n,1))'''
 
 #plot show is used to test whether the arrays are in a desirable format
 '''plt.imshow(Pyhy, interpolation= 'nearest')
@@ -51,46 +44,34 @@ def calcPyh(n, Pyhy, Py):
 #plt.imshow(Pyh, interpolation='nearest')
 #plt.show()
 
-#calculate c given Pyhy, Py, Pyh
-
+#calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
 def chCap(Pyhy):
     chCap1 = 0
     for i in range(n):
         for j in range(n):
-            c = Pyhy[i,j]*Py[j]*math.log(Pyhy[i,j]/Pyh[i], 2)
+            inParenPrimer = float(Pyhy[i,j])/float(Pyh[i])
+            inParen = math.log(inParenPrimer, 2)
+            c = Pyhy([i,j])*(Py[j])*(inParen)
             chCap1 = chCap1 + c
         j = j + 1
     i = i + 1
-    print chCap1
-
-chCap(Pyhy)
-
-
-'''
+    return chCap1
 
 #Set the constraints on the function "cap" - still in progress
 cons = ({'type': 'eq',
-          'fun' : lambda x: np.array(n*Py - 1)
-          },
+          'fun' : lambda x: np.array(n*Py - 1)},
         {'type': 'ineq',
-          'fun' : lambda x: np.array()
-          },
+          'fun' : lambda x: np.array()},
          {'type': 'eq',
-          'fun' : lambda x: np.array()
-          },
+          'fun' : lambda x: np.array()},
          {'type': 'ineq',
-          'fun' : lambda x: np.array()
-          })
-
-#minimize the function
-result = optimize.minimize(cap, [0.0,1,0],
+          'fun' : lambda x: np.array()})
+          
+#use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
+#may have to add additional arguments to minimize
+          
+result = optimize.minimize(chCap, [0.0,1,0],
          constraints=cons, method='SLSQP', options={'disp': True})
-        
-print result'''
-
+         
+print result
     
-
-
-
-
-
