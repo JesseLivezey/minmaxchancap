@@ -7,15 +7,17 @@ import numpy as np
 from scipy import optimize
 import math
 
-#initialize number of classes required
+#initialize the P(Yj) array 
 n = 3
-n1 = float(n)
-x = float(1/n1)
-#the following arrays are random arrays used to test the function
-Pyhy = np.random.rand(n,n)
-Pyh = np.random.rand(n,1)
-Py = np.array((x,1))
+x = 1.0/float(n)
 
+#the following arrays are arrays used to test the function
+Pyhy = np.array([[0.2, 0.4, 0.4], [0.3, 0.4, 0.3], [0.5, 0.2, 0.3]])
+Pyh = np.random.rand(n,1)
+Pyh /= Pyh.sum()
+Py = np.ndarray(shape=(n,1), dtype=float, 
+                buffer=np.array([x,x,x]))
+                
 #alternatively, the arrays can be configured into arrays of zeros using
 '''Pyhy = np.zeros((n,n))
 Pyh = np.zeros((n,1))
@@ -35,7 +37,6 @@ plt.show()'''
 def calcPyh(n, Pyhy, Py):
     for i in range(n):
         for j in range(n):
-            global Pyh
             Pyh[i] = Pyh[i] + Py[j]*Pyhy[i,j]
         j = j+1
     i = i + 1
@@ -45,33 +46,37 @@ def calcPyh(n, Pyhy, Py):
 #plt.show()
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
-def chCap(Pyhy):
+def chCap():
     chCap1 = 0
     for i in range(n):
         for j in range(n):
             inParenPrimer = float(Pyhy[i,j])/float(Pyh[i])
             inParen = math.log(inParenPrimer, 2)
-            c = Pyhy([i,j])*(Py[j])*(inParen)
+            a = float(Pyhy[i,j])
+            b = float(Py[j])
+            d = float(inParen)
+            c = a*b*d
             chCap1 = chCap1 + c
         j = j + 1
     i = i + 1
     return chCap1
 
+print chCap()
+
+def con1(Py):
+    return Py
+
+def con2(Py):
+    return np.sum(Py) - 1
+    
 #Set the constraints on the function "cap" - still in progress
-cons = ({'type': 'eq',
-          'fun' : lambda x: np.array(n*Py - 1)},
-        {'type': 'ineq',
-          'fun' : lambda x: np.array()},
-         {'type': 'eq',
-          'fun' : lambda x: np.array()},
-         {'type': 'ineq',
-          'fun' : lambda x: np.array()})
+cons = ({'type': 'ineq', 'fun' : con1},
+        {'type': 'eq', 'fun' : con2})
           
 #use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
 #may have to add additional arguments to minimize
           
-result = optimize.minimize(chCap, [0.0,1,0],
-         constraints=cons, method='SLSQP', options={'disp': True})
+result = optimize.minimize(chCap, constraints=cons, method='SLSQP', options={'disp': True})
          
 print result
     
