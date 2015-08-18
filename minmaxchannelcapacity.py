@@ -14,7 +14,7 @@ import math
 #n is the number of dimensions of the Pyhy matrix
 n = 3
 #the following arrays are arrays used to test the function
-Pyhy = np.array([[0.2, 0.4, 0.4], [0.3, 0.4, 0.3], [0.5, 0.2, 0.3]])
+Pyhy = np.array([[0.2, 0.4, 0.4], [0.5, 0.4, 0.1], [0.3, 0.4, 0.3]])
 Pyh = np.random.rand(n,1)
 Pyh /= Pyh.sum()
 #initialize the P(Yj) array 
@@ -49,7 +49,7 @@ def calcPyh(n, Pyhy, Py):
 #plt.show()
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
-def chCap(Pyhy):
+def chCap(inputArray):
     chCap1 = 0
     for i in range(n):
         for j in range(n):
@@ -62,22 +62,19 @@ def chCap(Pyhy):
             chCap1 = chCap1 + c
     return chCap1
 
-#print chCap()
-
 #constraint 1: Pyhy > 0
-def con1(Pyhy):
+def con1(inputArray):
     return Pyhy.min()
 
 #constraint 2: sum of Pyhy elements in a row = 1 because total probability is 1
-def con2(Pyhy):
+def con2(inputArray):
     for i in range(n):
-        aNum = i+1
-        con2a = np.sum(Pyhy, axis=aNum) - 1
+        con2a = Pyhy[i].sum() - 1
         con2b = math.pow(con2a, 2)
-    return con2b.min()
+    return con2b
 
 #constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Pyi = r
-def con3(Pyhy):
+def con3(inputArray):
     for i in range(n):
         for j in range(n):
             inProduct = Pyhy[i,j]*Py[j]
@@ -85,14 +82,14 @@ def con3(Pyhy):
     return con3a.min()
 
 #this alternative 3rd constraint uses numpy.sum instead of a for loop within another for loop.
-def alternativecon3(Pyhy):
+def alternativecon3(inputArray):
     axisSum = np.sum(Pyhy, axis=1)
     inSummation = axisSum*Py
     con3z = inSummation - r
     return con3z
 
 #this is the constraint that applies to rows where there are only 0s and 1s?
-def con4(Pyhy):
+def con4(inputArray):
     for i in range(n):
         for j in range(n):
             zeros = Pyhy[i,j] - Pyhy[i,j-1]
