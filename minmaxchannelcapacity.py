@@ -49,8 +49,8 @@ def calcPyh(n, Pyhy, Py):
 #plt.show()
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
-def chCap(inputArray):
-    chCap1 = 0
+def chCapMin(inputArray):
+    chCapMin1 = 0
     for i in range(n):
         for j in range(n):
             inParenPrimer = float(Pyhy[i,j])/float(Pyh[i])
@@ -59,14 +59,28 @@ def chCap(inputArray):
             b = float(Py[j])
             d = float(inParen)
             c = a*b*d
-            chCap1 = chCap1 + c
-    return chCap1
+            chCapMin1 = chCapMin1 + c
+    return chCapMin1
+
+def chCapMax(inputArray):
+    chCapMax1 = 0
+    for i in range(n):
+        for j in range(n):
+            inParenPrimer = float(Pyhy[i,j])/float(Pyh[i])
+            inParen = math.log(inParenPrimer, 2)
+            a = float(Pyhy[i,j])
+            b = float(Py[j])
+            d = float(inParen)
+            c = -(a*b*d)
+            chCapMax1 = chCapMax1 + c
+    return chCapMax1
 
 #constraint 1: Pyhy > 0
 def con1(inputArray):
     return Pyhy.min()
 
 #constraint 2: sum of Pyhy elements in a row = 1 because total probability is 1
+#removed as of right now because it is exiting function - "more equality constraints than independent variables"
 def con2(inputArray):
     for i in range(n):
         con2a = Pyhy[i].sum() - 1
@@ -97,16 +111,26 @@ def con4(inputArray):
 
 #Set the constraints on the function "cap"
 cons = ({'type': 'ineq', 'fun' : con1},
-        {'type': 'eq', 'fun' : con2},
+#        {'type': 'eq', 'fun' : con2},
         {'type': 'eq', 'fun' : con3})
           
 #use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
-#may have to add additional arguments to maximize
 
 #flatten the array
 np.ravel(Pyhy, order='C')
+
+#the following two optimizations minimize the function by minimizing the ChCap function (ChCapMin)
           
-result = optimize.minimize(chCap, [1], constraints=cons, method='SLSQP', options={'disp': True})
-         
-print result.Pyhy
-    
+minimizePyhy = optimize.minimize(chCapMin, [1], constraints=cons, method='SLSQP', options={'disp': True})
+print minimizePyhy
+
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, [1], eqcons=[con3], ieqcons=[con1])
+print minimizePyhyfmin
+
+#the following two optimizations maximize the function by minimizing the negative of the ChCap function (ChCapMax)
+
+maximizePyhy = optimize.minimize(chCapMax, [1], constraints=cons, method='SLSQP', options={'disp': True})
+print maximizePyhy
+
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, [1], eqcons=[con3], ieqcons=[con1]) 
+print maximizePyhyfmin
