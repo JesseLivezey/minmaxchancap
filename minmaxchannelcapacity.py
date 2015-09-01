@@ -14,7 +14,7 @@ import math
 #n is the number of dimensions of the Pyhy matrix
 n = 3
 #the following arrays are arrays used to test the function
-Pyhy = np.array([[0.2, 0.4, 0.4], [0.5, 0.4, 0.1], [0.3, 0.4, 0.3]])
+Pyhy = np.array([[0.1, 0.4, 0.5], [0.3, 0.4, 0.3], [0.5, 0.1, 0.4]])
 Pyh = np.random.rand(n,1.0)
 Pyhyguess = np.ones((n,n))
 #initialize the P(Yj) array 
@@ -55,19 +55,19 @@ def calcPyh(inputArray):
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
 def chCapMin(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
-    chCapMin1 = 0.0
-    Pyh_ii = calcPyh(Pyhy_i)
+    chanCap = 0.0
+    Pyh_i = calcPyh(Pyhy_i)
     for i in range(n):
         for j in range(n):
-            inParenPrimer = float(Pyhy[i,j])/float(Pyh_ii[i])
+            inParenPrimer = float(Pyhy_i[i,j])/float(Pyh_i[i])
             if inParenPrimer > 0:
                 inParen = math.log(inParenPrimer, 2)
-                a = float(Pyhy[i,j])
+                a = float(Pyhy_i[i,j])
                 b = float(Py[j])
                 d = float(inParen)
                 c = a*b*d
-                chCapMin1 = chCapMin1 + c
-    return chCapMin1
+                chanCap = chanCap + c
+    return chanCap
 
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
@@ -77,10 +77,13 @@ def con1(inputArray):
     return inputArray.min()
 
 #constraint 2: sum of Pyhy elements in a row = 1 because total probability is 1
-#removed as of right now because it is exiting function - "more equality constraints than independent variables"
 def con2(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
-    con2a = ((Pyhy_i.sum(axis=1)-1)**2).min() 
+    inputArraySum = np.sum(Pyhy_i)
+    con2a = inputArraySum - (n**2)
+#    for j in range(n-1):
+#        axisSum = Pyhy_i.sum(axis=j)-1
+#        con2a = (axisSum**2).min()
     return con2a
 
 #constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Pyi = r
@@ -95,8 +98,9 @@ def con3(inputArray):
 #this alternative 3rd constraint uses numpy.sum instead of a for loop within another for loop.
 def alternativecon3(inputArray):
     Pyhy = inputArray.reshape(n,n)
-    axisSum = np.sum(Pyhy, axis=1)
-    inSummation = axisSum*Py
+    for i in range(n):
+        axisSum = np.sum(Pyhy, axis=i)
+        inSummation = axisSum*Py[i]
     con3z = inSummation - r
     return con3z
 
@@ -106,46 +110,65 @@ def con4(inputArray):
     for i in range(n):
         for j in range(n):
             zeros = Pyhy_i[i,j] - Pyhy_i[i,j-1]
-            return zeros - 1
+    con4a = zeros - 1.0
+    return con4a
 
 #Set the constraints on the function "cap"
 cons = ({'type': 'ineq', 'fun' : con1},
         {'type': 'eq', 'fun' : con2},
-        {'type': 'eq', 'fun' : con3})
+        {'type': 'eq', 'fun' : con3},
+        {'type': 'ineq', 'fun' : con4})
           
 #use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
 #may have to add additional arguments to maximize
 
-#the following two optimizations minimize the function by minimizing the ChCap function
+#the following optimization minimizes the function
           
 minimizePyhy = optimize.minimize(chCapMin, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
 #print minimizePyhy
 
-#minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1])
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
 #print minimizePyhyfmin
 
-#the following two optimizations maximize the function by minimizing the negative of the ChCap function
+#the following optimization maximizes the function by minimizing the negative of the function
 
 maximizePyhy = optimize.minimize(chCapMax, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
 #print maximizePyhy
 
-#maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1]) 
-#print maximizePyhyfmin
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
+#print minimizePyhyfmin
 
 #the following are functions used to test whether the chcap function works
 
-def testfunc(inputArray):
-    Pyhy_itest = np.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]])
-    Py_itest = np.array([[1.0/float(n)],[1.0/float(n)],[1.0/float(n)]])
-    Pyh_itest = calcPyh(Pyhy_itest)
-    chCapMin_itest = chCapMin(Pyhy_itest)
-    return chCapMin_itest
+#the following function makes sure that for a 2darray of n x n dimensions...
+#an inputArray where the diagonal is all ones and everything else is 0 yields a channel capacity of logbase2(n)
 
-minimizePyhyTestminimize = optimize.minimize(testfunc, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
-print minimizePyhyTestminimize
+def chCapTestFunc():
+    Pyhy_test = np.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]])
+    chCapTest = 0.0
+    Pyhy_testi=np.ravel(Pyhy_test, order='C')
+    chCapTest = chCapMin(Pyhy_testi)
+    assert np.allclose(np.log2(n), chCapTest) # - - It Works!!
+    return chCapTest
 
-minimizePyhyTestfmin = optimize.fmin_slsqp(testfunc, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1])
-print minimizePyhyTestfmin
+#the following function makes sure that for a 2darray of n x n dimensions...
+#an inputArray where every item is filled with ones yields a channel capacity of 0
+
+def chCapTestFunc2():
+    Pyhy_test2 = np.array([[1.0,1.0,1.0],[1.0,1.0,1.0],[1.0,1.0,1.0]])
+    chCapTest2 = 0.0
+    Pyhy_test2i=np.ravel(Pyhy_test2, order='C')
+    chCapTest2 = chCapMin(Pyhy_test2i)
+    assert np.allclose(0.0, chCapTest2) # - - It Works!!
+    return chCapTest2
+
+
+
+
+
+    
+
+
 
 
 
