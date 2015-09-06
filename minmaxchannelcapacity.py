@@ -27,13 +27,13 @@ r = 0.40
 Pyhy_i=np.ravel(Pyhy, order='C')
 
 #plot show is used to test whether the arrays are in a desirable format
-'''plt.imshow(Pyhy, interpolation= 'nearest')
+plt.imshow(Pyhy, interpolation= 'nearest')
 plt.colorbar()
 plt.show()
 
 plt.imshow(Pyh, interpolation= 'nearest')
 plt.colorbar()
-plt.show()'''
+plt.show()
 
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray):
@@ -71,8 +71,8 @@ def con1(inputArray):
 #constraint 2: sum of Pyhy elements in the matrix = 1*n because total probability is 1 added n times
 def con2(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
-    inputArraySum = np.sum(Pyhy_i)
-    con2a = inputArraySum - (n)
+    inputArraySum = (np.sum(Pyhy_i))**2
+    con2a = inputArraySum - (n**2)
 #    for j in range(n-1):
 #        axisSum = Pyhy_i.sum(axis=j)-1
 #        con2a = (axisSum**2).min()
@@ -120,7 +120,7 @@ cons = ({'type': 'ineq', 'fun' : con1},
 #minimizePyhy = optimize.minimize(chCapMin, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
 #print minimizePyhy
 
-minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3], ieqcons=[con1,con4])
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
 #print minimizePyhyfmin
 
 #the following optimization maximizes the function by minimizing the negative of the function
@@ -128,7 +128,7 @@ minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3], ieqco
 #maximizePyhy = optimize.minimize(chCapMax, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
 #print maximizePyhy
 
-maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3], ieqcons=[con1,con4])
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
 #print minimizePyhyfmin
 
 #the following are functions used to test whether the chcap function works
