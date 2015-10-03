@@ -27,13 +27,13 @@ r = 0.40
 Pyhy_i=np.ravel(Pyhy, order='C')
 
 #plot show is used to test whether the arrays are in a desirable format
-plt.imshow(Pyhy, interpolation= 'nearest')
+'''plt.imshow(Pyhy, interpolation= 'nearest')
 plt.colorbar()
 plt.show()
 
 plt.imshow(Pyh, interpolation= 'nearest')
 plt.colorbar()
-plt.show()
+plt.show()'''
 
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray):
@@ -44,11 +44,11 @@ def calcPyh(inputArray):
             Pyh_i[i] = Pyh_i[i] + Py[j]*Pyhy_i[i,j]
     return Pyh_i
 
-Pyh_iplot = calcPyh(Pyhy)
+'''Pyh_iplot = calcPyh(Pyhy)
 Pyh_iplot = [Pyh_iplot]
 plt.imshow(Pyh_iplot)
 plt.colorbar()
-plt.show()
+plt.show()'''
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
 def chCapMin(inputArray):
@@ -67,11 +67,11 @@ def chCapMin(inputArray):
                 chanCap = chanCap + c
     return chanCap
 
-chanCapPlot = chCapMin(Pyhy)
+'''chanCapPlot = chCapMin(Pyhy)
 chanCapPlot = [[chanCapPlot]]
 plt.imshow(chanCapPlot)
 plt.colorbar()
-plt.show()
+plt.show()'''
 
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
@@ -128,20 +128,24 @@ cons = ({'type': 'ineq', 'fun' : con1},
 #use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
 
 #the following optimization minimizes the function
-          
-#minimizePyhy = optimize.minimize(chCapMin, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
-#print minimizePyhy
 
 minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
-#print minimizePyhyfmin
+
+np.array(minimizePyhyfmin)
+minOutput = minimizePyhyfmin.reshape(n,n)
+plt.imshow(minOutput)
+plt.colorbar()
+plt.show()
 
 #the following optimization maximizes the function by minimizing the negative of the function
 
-#maximizePyhy = optimize.minimize(chCapMax, Pyhyguess, constraints=cons, method='SLSQP', options={'disp': True})
-#print maximizePyhy
-
 maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
-#print minimizePyhyfmin
+
+np.array(maximizePyhyfmin)
+maxOutput = maximizePyhyfmin.reshape(n,n)
+plt.imshow(maxOutput)
+plt.colorbar()
+plt.show()
 
 #the following are functions used to test whether the chcap function works
 
