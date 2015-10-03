@@ -44,6 +44,12 @@ def calcPyh(inputArray):
             Pyh_i[i] = Pyh_i[i] + Py[j]*Pyhy_i[i,j]
     return Pyh_i
 
+Pyh_iplot = calcPyh(Pyhy)
+Pyh_iplot = [Pyh_iplot]
+plt.imshow(Pyh_iplot)
+plt.colorbar()
+plt.show()
+
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
 def chCapMin(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
@@ -60,6 +66,12 @@ def chCapMin(inputArray):
                 c = a*b*d
                 chanCap = chanCap + c
     return chanCap
+
+chanCapPlot = chCapMin(Pyhy)
+chanCapPlot = [[chanCapPlot]]
+plt.imshow(chanCapPlot)
+plt.colorbar()
+plt.show()
 
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
