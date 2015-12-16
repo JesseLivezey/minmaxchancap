@@ -131,20 +131,23 @@ cons = ({'type': 'ineq', 'fun' : con1},
 
 minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
 
+plt.figure()
 np.array(minimizePyhyfmin)
 minOutput = minimizePyhyfmin.reshape(n,n)
-plt.imshow(minOutput)
+plt.imshow(minOutput, interpolation='nearest', cmap='viridis')
 plt.colorbar()
-plt.show()
+plt.title('Minimum Capacity')
 
 #the following optimization maximizes the function by minimizing the negative of the function
 
 maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhyguess, eqcons=[con3,con2], ieqcons=[con1,con4])
 
+plt.figure()
 np.array(maximizePyhyfmin)
 maxOutput = maximizePyhyfmin.reshape(n,n)
-plt.imshow(maxOutput)
+plt.imshow(maxOutput, interpolation='nearest', cmap='viridis')
 plt.colorbar()
+plt.title('Maximum Capacity')
 plt.show()
 
 #the following are functions used to test whether the chcap function works
