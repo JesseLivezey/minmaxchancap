@@ -20,7 +20,7 @@ Pyhyguess = np.ones((n,n))
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
 #r is the fixed classification accuracy
-r = 0.30
+r = 0.40
 #flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
 
@@ -57,21 +57,24 @@ def chCapMax(inputArray):
 def con1(inputArray):
     return inputArray.min()
 
-#constraint 2: sum of Pyhy elements in the matrix = 1*n because total probability is 1 added n times
+#constraint 2: sum of Pyhy elements in a row is np.sum(Pyhy_i[i])
 def con2(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
     inputArraySum = 0
     for i in range(n):
-        inputArraySum += (np.sum(Pyhy_i[i]-1))**2
+        inputArraySum += (np.sum(Pyhy_i[i])-1)**2
     con2a = inputArraySum
     return con2a
 
-#constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Pyi = r
+#constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Py = r
 def con3(inputArray):
     inProduct = 0
     Pyhy_i = inputArray.reshape(n,n)
     for i in range(n):
-        inProduct += Pyhy_i[i,i]*Py[i]
+#        print Pyhy_i[i,i]
+#        print Py[i]
+            inProduct += Pyhy_i[i,i]*Py[i]
+#        print inProduct
     con3a = inProduct - r
     return con3a
 
