@@ -24,15 +24,6 @@ r = 0.30
 #flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
 
-#plot show is used to test whether the arrays are in a desirable format
-'''plt.imshow(Pyhy, interpolation= 'nearest')
-plt.colorbar()
-plt.show()
-
-plt.imshow(Pyh, interpolation= 'nearest')
-plt.colorbar()
-plt.show()'''
-
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray):
     Pyh = np.zeros(n)
@@ -41,12 +32,6 @@ def calcPyh(inputArray):
         for j in range(n):
             Pyh[i] = Pyh[i] + Py[j]*Pyhy_i[j,i]
     return Pyh
-
-'''Pyh_iplot = calcPyh(Pyhy)
-Pyh_iplot = [Pyh_iplot]
-plt.imshow(Pyh_iplot)
-plt.colorbar()
-plt.show()'''
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
 def chCapMin(inputArray):
@@ -65,12 +50,6 @@ def chCapMin(inputArray):
                 chanCap = chanCap + c
     return chanCap
 
-'''chanCapPlot = chCapMin(Pyhy)
-chanCapPlot = [[chanCapPlot]]
-plt.imshow(chanCapPlot)
-plt.colorbar()
-plt.show()'''
-
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
 
@@ -81,11 +60,10 @@ def con1(inputArray):
 #constraint 2: sum of Pyhy elements in the matrix = 1*n because total probability is 1 added n times
 def con2(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
-    inputArraySum = (np.sum(Pyhy_i))**2
-    con2a = inputArraySum - (n**2)
-#    for j in range(n-1):
-#        axisSum = Pyhy_i.sum(axis=j)-1
-#        con2a = (axisSum**2).min()
+    inputArraySum = 0
+    for i in range(n):
+        inputArraySum += (np.sum(Pyhy_i[i]-1))**2
+    con2a = inputArraySum
     return con2a
 
 #constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Pyi = r
@@ -93,8 +71,7 @@ def con3(inputArray):
     inProduct = 0
     Pyhy_i = inputArray.reshape(n,n)
     for i in range(n):
-        inProduct += Pyhy_i[i]*calcPyh(inputArray)[i]
-    inProduct = sum(inProduct)
+        inProduct += Pyhy_i[i,i]*Py[i]
     con3a = inProduct - r
     return con3a
 
@@ -108,4 +85,3 @@ def con4(inputArray):
                 zeros = Pyhy_i[i,j] - Pyhy_i[i,j-1]
     con4a = zeros - 1.0
     return con4a
-    
