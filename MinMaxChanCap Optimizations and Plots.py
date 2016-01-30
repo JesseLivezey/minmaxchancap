@@ -4,7 +4,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-from minimummaximumchannelcapacity import chCapMin, chCapMax, con1, con2, con3, con4
+from minimummaximumchannelcapacity import chCapMin, chCapMax,con1, con2, con3, con4
 import numpy as np
 from scipy import optimize
 from matplotlib import pyplot as plt
@@ -17,8 +17,6 @@ Pyhyguess = np.ones((n,n))
 #initialize the P(Yj) array 
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
-#r is the fixed classification accuracy
-r = 0.30
 #flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
 
@@ -27,12 +25,10 @@ cons = ({'type': 'ineq', 'fun' : con1},
         {'type': 'eq', 'fun' : con2},
         {'type': 'eq', 'fun' : con3},
         {'type': 'ineq', 'fun' : con4})
-          
-#use an optimization to minimize the function in the form "minimize(funcName, [guess], constraints=, method=, options= )
 
 #the following optimization minimizes the function
 
-minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con1, con4])
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)])
 
 plt.figure()
 np.array(minimizePyhyfmin)
@@ -44,7 +40,9 @@ plt.show()
 
 #the following optimization maximizes the function by minimizing the negative of the function
 
-maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con1, con4])
+maximizePyhy = optimize.minimize(chCapMax, Pyhy_in, method='SLSQP', bounds = [(0, 1) for ii in range(n**2)], constraints=(cons))
+
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)])
 
 plt.figure()
 np.array(maximizePyhyfmin)
@@ -53,4 +51,3 @@ plt.imshow(maxOutput, interpolation='nearest')#, cmap='viridis')
 plt.colorbar()
 plt.title('Maximum Capacity')
 plt.show()
-
