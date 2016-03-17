@@ -4,27 +4,12 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-from minimummaximumchannelcapacity import chCapMin, chCapMax,con1, con2, con3, con4
+from minimummaximumchannelcapacity import n, Pyhy, Py, Pyhyguess, x, r, chCapMin, chCapMax, con1, con2, con3, con4
 import numpy as np
 from scipy import optimize
 from matplotlib import pyplot as plt
 
-#n is the number of dimensions of the Pyhy matrix
-n = 3
-#the following arrays are arrays used to test the function
-Pyhy = np.array([[0.1, 0.4, 0.5], [0.3, 0.4, 0.3], [0.5, 0.1, 0.4]])
-Pyhyguess = np.ones((n,n))
-#initialize the P(Yj) array 
-x = 1.0/float(n)
-Py = x*np.ones(float(n))
-#flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
-
-#Set the constraints on the function "cap"
-cons = ({'type': 'ineq', 'fun' : con1},
-        {'type': 'eq', 'fun' : con2},
-        {'type': 'eq', 'fun' : con3},
-        {'type': 'ineq', 'fun' : con4})
 
 #the following optimization minimizes the function
 
@@ -40,7 +25,7 @@ plt.show()
 
 #the following optimization maximizes the function by minimizing the negative of the function
 
-maximizePyhy = optimize.minimize(chCapMax, Pyhy_in, method='SLSQP', bounds = [(0, 1) for ii in range(n**2)], constraints=(cons))
+#maximizePyhy = optimize.minimize(chCapMax, Pyhy_in, method='SLSQP', bounds = [(0, 1) for ii in range(n**2)], constraints=(cons))
 
 maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)])
 

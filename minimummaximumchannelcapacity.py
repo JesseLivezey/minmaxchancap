@@ -10,12 +10,11 @@ import math
 #Pyhy[i,j] signifies the probability that the predicted class i is chosen given that the true class is j
 #Pyh[i] signifies the probability that an object is predicted to be in class i
 #Py[j] is the probability that a random object is from class j
-
 #n is the number of dimensions of the Pyhy matrix
 n = 3
 #the following arrays are arrays used to test the function
-Pyhy = np.array([[0.1, 0.4, 0.5], [0.3, 0.4, 0.3], [0.5, 0.1, 0.4]])
-Pyhyguess = np.ones((n,n))
+Pyhy = np.array([[0.6, 0.2, 0.2], [0.3, 0.4, 0.3], [0.4, 0.1, 0.5]])
+Pyhyguess = np.ones((n,n)) 
 #initialize the P(Yj) array 
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
@@ -66,6 +65,8 @@ def con2(inputArray):
     con2a = inputArraySum
     return con2a
 
+con2(Pyhy)
+
 #constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Py = r
 def con3(inputArray):
     inProduct = 0
@@ -78,13 +79,24 @@ def con3(inputArray):
     con3a = inProduct - r
     return con3a
 
-#this is the constraint that applies to rows where there are only 0s and 1s
+con3(Pyhy)
+
+#this is the constraint that makes Pyhy[i,i] > Pyhy[i,j]
 def con4(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
-    zeros=0
+    zeros = 0
+    zeroarray = []
     for i in range(n):
-        for j in range(n):
-            if Pyhy_i[i,j] == 1.0:                
-                zeros = Pyhy_i[i,j] - Pyhy_i[i,j-1]
-    con4a = zeros - 1.0
-    return con4a
+        for j in range(n):  
+            if i != j:
+                zeros = Pyhy_i[i,i] - Pyhy_i[i,j]
+                zeroarray.append(round(zeros,1))
+    zeroarray = np.array(zeroarray)
+    zeroarray = zeroarray.reshape(n,n-1)
+    for i in range(n):
+        for j in range(n-1):
+            con4a = zeroarray[i,j]
+    return con4a 
+
+con4(Pyhy)
+            

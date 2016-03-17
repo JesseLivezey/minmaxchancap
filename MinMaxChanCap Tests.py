@@ -6,19 +6,9 @@
 
 #the following are functions used to test whether the chcap function works
 
-from minimummaximumchannelcapacity import chCapMin
+from minimummaximumchannelcapacity import n, Pyhy, Py, Pyhyguess, x, r, chCapMin, chCapMax, con1, con2, con3, con4
 import numpy as np
 
-n = 3
-#the following arrays are test arrays for the function
-Pyhy = np.array([[0.1, 0.4, 0.5], [0.3, 0.4, 0.3], [0.5, 0.1, 0.4]])
-Pyhyguess = np.ones((n,n))
-#initialize the P(Yj) array 
-x = 1.0/float(n)
-Py = x*np.ones(float(n))
-#r is the fixed classification accuracy
-r = 0.30
-#flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
 
 #the following function makes sure that for a 2darray of n x n dimensions...
