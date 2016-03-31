@@ -13,15 +13,19 @@ import math
 #n is the number of dimensions of the Pyhy matrix
 n = 3
 #the following arrays are arrays used to test the function
-Pyhy = np.array([[0.6, 0.2, 0.2], [0.3, 0.4, 0.3], [0.4, 0.1, 0.5]])
+Pyhy = np.array([[0.6, 0.2, 0.2], 
+                 [0.3, 0.4, 0.3], 
+                 [0.4, 0.1, 0.5]])
+                 
+#flatten the array
+Pyhy_in=np.ravel(Pyhy, order='C')
+                 
 Pyhyguess = np.ones((n,n)) 
 #initialize the P(Yj) array 
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
 #r is the fixed classification accuracy
 r = 0.40
-#flatten the array
-Pyhy_in=np.ravel(Pyhy, order='C')
 
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray):
@@ -52,11 +56,9 @@ def chCapMin(inputArray):
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
 
-#constraint 1: Pyhy > 0
-def con1(inputArray):
-    return inputArray.min()
+#constraint 1 (con1) was removed and replaed by the 'bounds' method in minimize.fmin_slsqp 
 
-#constraint 2: sum of Pyhy elements in a row is np.sum(Pyhy_i[i])
+#constraint 2: sum of Pyhy elements in a row is np.sum(Pyhy_i[i]) = 1.0
 def con2(inputArray):
     Pyhy_i = inputArray.reshape(n,n)
     inputArraySum = 0
@@ -65,24 +67,18 @@ def con2(inputArray):
     con2a = inputArraySum
     return con2a
 
-con2(Pyhy)
-
 #constraint 3: fixed classification accuracy, summation(index i) of Pyhy * Py = r
 def con3(inputArray):
     inProduct = 0
     Pyhy_i = inputArray.reshape(n,n)
     for i in range(n):
-#        print Pyhy_i[i,i]
-#        print Py[i]
             inProduct += Pyhy_i[i,i]*Py[i]
-#        print inProduct
     con3a = inProduct - r
     return con3a
 
-con3(Pyhy)
-
 #this is the constraint that makes Pyhy[i,i] > Pyhy[i,j]
 def con4(inputArray):
+    tab = 0.0
     Pyhy_i = inputArray.reshape(n,n)
     zeros = 0
     zeroarray = []
@@ -96,7 +92,9 @@ def con4(inputArray):
     for i in range(n):
         for j in range(n-1):
             con4a = zeroarray[i,j]
-    return con4a 
-
-con4(Pyhy)
-            
+            if con4a > 0.0:
+                tab += 1.0
+    if tab == (n*(n-1)):
+        return 1.0
+    else:
+        return -1.0  
