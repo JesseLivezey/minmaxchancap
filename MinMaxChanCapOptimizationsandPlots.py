@@ -4,7 +4,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-from minimummaximumchannelcapacity import n, Pyhy, Pyhy_in, Py, Pyhyguess, x, r, chCapMin, chCapMax, con2, con3, con4
+from minimummaximumchannelcapacity import n, Pyhy, Pyhy_in, Py, x, r, chCapMin, chCapMax, con2, con3, con4
 import numpy as np
 from scipy import optimize
 from matplotlib import pyplot as plt

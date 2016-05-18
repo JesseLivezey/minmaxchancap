@@ -1,5 +1,5 @@
 #! /usr/bin/python
-#Copyright Amrith Krishnan 2015
+#Copyright Amrith Krishnan 2015-16
 
 #import libraries
 from matplotlib import pyplot as plt
@@ -10,22 +10,29 @@ import math
 #Pyhy[i,j] signifies the probability that the predicted class i is chosen given that the true class is j
 #Pyh[i] signifies the probability that an object is predicted to be in class i
 #Py[j] is the probability that a random object is from class j
+
+Pyhy_init_guess = np.array([[0.49, 0.31, 0.21], 
+                            [0.28, 0.29, 0.21], 
+                            [0.25, 0.34, 0.40]])
+                 
 #n is the number of dimensions of the Pyhy matrix
-n = 3
-#the following arrays are arrays used to test the function
-Pyhy = np.array([[0.6, 0.2, 0.2], 
-                 [0.3, 0.4, 0.3], 
-                 [0.4, 0.1, 0.5]])
+n = raw_input('Enter the Pyhy dimensions: ')
+n = int(n)
+
+#randomize the input array
+Pyhy = np.random.rand(n,n)
+print Pyhy
                  
 #flatten the array
 Pyhy_in=np.ravel(Pyhy, order='C')
-                 
-Pyhyguess = np.ones((n,n)) 
+
 #initialize the P(Yj) array 
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
+
 #r is the fixed classification accuracy
-r = 0.40
+r = raw_input('Enter the fixed classification accuracy: ')
+r = float(r)
 
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray):
@@ -56,7 +63,7 @@ def chCapMin(inputArray):
 def chCapMax(inputArray):
     return -chCapMin(inputArray)
 
-#constraint 1 (con1) was removed and replaed by the 'bounds' method in minimize.fmin_slsqp 
+#constraint 1 (con1) was removed and replaced by the 'bounds' method in minimize.fmin_slsqp 
 
 #constraint 2: sum of Pyhy elements in a row is np.sum(Pyhy_i[i]) = 1.0
 def con2(inputArray):
@@ -75,26 +82,16 @@ def con3(inputArray):
             inProduct += Pyhy_i[i,i]*Py[i]
     con3a = inProduct - r
     return con3a
-
+    
 #this is the constraint that makes Pyhy[i,i] > Pyhy[i,j]
 def con4(inputArray):
-    tab = 0.0
     Pyhy_i = inputArray.reshape(n,n)
-    zeros = 0
-    zeroarray = []
-    for i in range(n):
-        for j in range(n):  
-            if i != j:
-                zeros = Pyhy_i[i,i] - Pyhy_i[i,j]
-                zeroarray.append(round(zeros,1))
-    zeroarray = np.array(zeroarray)
-    zeroarray = zeroarray.reshape(n,n-1)
-    for i in range(n):
-        for j in range(n-1):
-            con4a = zeroarray[i,j]
-            if con4a > 0.0:
-                tab += 1.0
-    if tab == (n*(n-1)):
-        return 1.0
-    else:
-        return -1.0  
+    # get diagonal vector (Pyhy[i,i])
+    Pyhy_diag = np.diag(Pyhy_i)
+    # get max of each row
+    Pyhy_max = Pyhy_i.max(axis=1)
+    # we want the difference to be positive or zero
+    diff = Pyhy_diag - Pyhy_max
+    # we want all of the differences to be positive, so we can just return the most negative one
+    worst_case = diff.min()
+    return worst_case
