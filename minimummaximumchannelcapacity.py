@@ -1,5 +1,4 @@
 #! /usr/bin/python
-#Copyright Amrith Krishnan 2015-16
 
 #import libraries
 from matplotlib import pyplot as plt
@@ -20,12 +19,22 @@ def initializer(r, n):
     matrix *= 1-r
     np.fill_diagonal(matrix, r)
     return matrix
-    
+
+def deriver(inputArray, r, n, Py):
+    Pyhy_i = inputArray.reshape(n,n)
+    dx = 0
+    for i in range(n):
+        for j in range(n):
+            print(Pyhy_i.dot(Py))
+            a = (Py[j] * math.log((Pyhy_i[i,j] / sum(Pyhy_i.dot(Py))), 10))
+            b = (Pyhy_i[i,j]/math.log(10))*((1/math.log(Pyhy_i[i,j]))-(1/sum(Pyhy_i.dot(Py))))
+            dx += a + b
+    return dx
+            
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray, n, Py):
-    Pyh = np.zeros(n)
     Pyhy_i = inputArray.reshape(n,n)
-#use Py = Pyhy.dot(Py) --- use numpy functionality to shorten and condense code
+    Pyh = np.zeros(n)
     for i in range(n):
         for j in range(n):
             Pyh[i] = Pyh[i] + Py[j]*Pyhy_i[j,i]
@@ -36,18 +45,15 @@ def chCapMin(inputArray, r, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
     chanCap = 0.0
     Pyh_i = calcPyh(Pyhy_i, n, Py)
+    print(Pyh_i)
     for i in range(n):
         for j in range(n):
             try:
-#                print(Pyhy_i[i])
-                inParenPrimer = float(Pyhy_i[i,j])/float(Pyh_i[i])
+                inParenPrimer = Pyhy_i[i,j]/Pyh_i[i]
             except ZeroDivisionError:
                 pass 
             if inParenPrimer > 0:
                 inParen = math.log(inParenPrimer, 2)
-                #combine all these values into a single statement to shorten code
-                #higher level coding allows us to simplify how we think about the program
-                #and also to use other python libraries/functions/algorithms in this code
                 a = float(Pyhy_i[i,j])
                 b = float(Py[j])
                 d = float(inParen)
