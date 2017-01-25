@@ -15,15 +15,15 @@ from matplotlib import pyplot as plt
 #Py[j] is the probability that a random object is from class j
 
 r = 0.4
-n = 4
-Pyhy = initializer(r, n)
+n = 3
+Pyhy = Initializer(r, n)
 Pyhy_in=np.ravel(Pyhy, order='C')
 x = 1.0/float(n)
 Py = x*np.ones(float(n))
 
 '''Add in additional arguments n, Py, to the "args" parameter in the optimize.fmin_slsqp functions below'''
-minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(r, n, Py), bounds = [(0, 1) for ii in range(n**2)])
-maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(r, n, Py), bounds = [(0, 1) for ii in range(n**2)])
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = Deriver, args=(r, n, Py))
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = Deriver, args=(r, n, Py))
 
 def plot_min():
 	plt.figure()
@@ -61,18 +61,18 @@ def bound_plot():
      for i in range(num):
          acc = i/100
          in_array.append(acc)
-    #    curr_max_func_value = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
+         curr_max_func_value = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
          curr_min_func_value = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
          out_array_min.append(chCapMin(curr_min_func_value, acc, n, Py))
-    #    out_array_max.append(chCapMax(curr_max_func_value, acc, n, Py))
+         out_array_max.append(chCapMax(curr_max_func_value, acc, n, Py))
      plt.scatter(in_array, out_array_min)
-    # plt.scatter(in_array, out_array_max)
+     plt.scatter(in_array, out_array_max)
      plt.title('Bound Minimum and Maximum')
      plt.xlabel('Classification Accuracy')
      plt.ylabel('Channel Capacity')
-     plt.xlim(0, 1.0)
-     plt.ylim(0, 1.0)
-     f1 = plt.figure()
+     plt.xlim(-1.0, 1.0)
+     plt.ylim(-1.0, 1.0)
+#     f1 = plt.figure()
      plt.show()
 
 #bound_plot() 
@@ -92,7 +92,7 @@ def bit_rate_plot():
     plt.xlabel('Classification Accuracy')
     plt.ylabel('Channel Capacity')
     plt.xlim(0, 1.0)
-    f2 = plt.figure()
+#    f2 = plt.figure()
     plt.show()
 
 #bit_rate_plot()
@@ -106,9 +106,9 @@ def second_plot():
         out_array.append((r*np.log(n*r)) + ((1-r)*np.log(n*(1-r))))
     plt.scatter(in_array, out_array)
     plt.xlim(0, 1.0)
-    f3 = plt.figure()
+#    f3 = plt.figure()
     plt.show()
-    f
+    
 #second_plot()
         
         

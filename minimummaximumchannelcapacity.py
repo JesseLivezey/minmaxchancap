@@ -12,7 +12,7 @@ import math
 #Py[j] is the probability that a random object is from class j
 
 #initialize a test matrix
-def initializer(r, n):
+def Initializer(r, n):
     matrix = np.random.rand(n,n)
     np.fill_diagonal(matrix, 0)
     matrix /= matrix.sum(axis=1, keepdims = True)
@@ -20,24 +20,37 @@ def initializer(r, n):
     np.fill_diagonal(matrix, r)
     return matrix
 
-def deriver(inputArray, r, n, Py):
+def Deriver(inputArray, r, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
-    dx = 0
+    dx = np.zeros((n,n))
     for i in range(n):
         for j in range(n):
-            print(Pyhy_i.dot(Py))
-            a = (Py[j] * math.log((Pyhy_i[i,j] / sum(Pyhy_i.dot(Py))), 10))
-            b = (Pyhy_i[i,j]/math.log(10))*((1/math.log(Pyhy_i[i,j]))-(1/sum(Pyhy_i.dot(Py))))
-            dx += a + b
-    return dx
+            try:
+                a = (Py[j] * math.log((Pyhy_i[i,j] / calcPyh(inputArray, n, Py)[i]), 10))
+                b = (1/math.log(10))
+                c = (1/math.log(10)) * (1/calcPyh(inputArray, n, Py)[i])
+                dx[i,j] = a + b - c
+            except ValueError:
+                print("Test failed. Run Again.")
+    return np.ravel(dx)
+
+def alternateDeriver(inputArray, r, n, Py):
+    '''after this i want to index into this and add element by element
+    using a[i,j] = (  ), b[i,j] = (  ), c[i,j] = (  ) and add a b c into dx after the summation'''
+    Pyhy_i = inputArray.reshape(n,n)
+    dx = np.zeros((n,n))
+    for i in range(n):
+        for j in range(n):
+            a = Py.dot(np.log(Pyhy_i.dot(1/calcPyh(inputArray, n, Py))) / math.log(10))
+            b = 1/math.log(10)
+            c = 1/(calcPyh(inputArray, n, Py)*math.log(10))
+            dx = a + b - c
+    return np.ravel(dx)
             
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
-    Pyh = np.zeros(n)
-    for i in range(n):
-        for j in range(n):
-            Pyh[i] = Pyh[i] + Py[j]*Pyhy_i[j,i]
+    Pyh = Pyhy_i.dot(Py)
     return Pyh
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
@@ -45,7 +58,6 @@ def chCapMin(inputArray, r, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
     chanCap = 0.0
     Pyh_i = calcPyh(Pyhy_i, n, Py)
-    print(Pyh_i)
     for i in range(n):
         for j in range(n):
             try:
