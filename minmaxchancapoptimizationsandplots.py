@@ -14,8 +14,8 @@ from matplotlib import pyplot as plt
 #Pyh[i] signifies the probability that an object is predicted to be in class i
 #Py[j] is the probability that a random object is from class j
 
-r = 0.4
-n = 3
+r = 0.15
+n = 10
 Pyhy = Initializer(r, n)
 Pyhy_in=np.ravel(Pyhy, order='C')
 x = 1.0/float(n)
@@ -54,7 +54,6 @@ def bound_plot():
      # access the last function value or Pyhy after optimization and compute channel capacity of this Pyhy
      # access the "current function value" from the dict returned y optimize.fmin_slsqp
      #for loop over accuracies and create a list of accuracies
-         
      num = 100
      out_array_min, out_array_max = [], []
      in_array = []
