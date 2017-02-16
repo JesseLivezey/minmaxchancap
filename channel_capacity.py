@@ -61,12 +61,13 @@ def calcPyh(inputArray, n, Py):
     return chanCap'''
     
 def chCapMin(inputArray, r, n, Py):
-    Pyhy_i = inputArray.reshape(n,n)
+    Pyhy_i = inputArray.reshape(n, n)
     Pyh_i = calcPyh(Pyhy_i, n, Py)
     nonzero = np.nonzero(Pyh_i)
-    ratio = Pyhy_i[nonzero]/Pyh_i[nonzero, np.newaxis]
-    log_ratio = np.log2(ratio) 
-    return np.sum(Pyhy_i[nonzero]*Py[np.newaxis, :]*log_ratio)
+    ratio = Pyhy_i[nonzero]/Pyh_i[nonzero]
+    joint = Pyhy_i[nonzero]*Py[np.newaxis, :]
+    nonzero = np.nonzero(joint)
+    return np.sum(joint[nonzero] * np.log2(ratio[nonzero]))
 
 def chCapMax(inputArray, r, n, Py):
     return -chCapMin(inputArray, r, n, Py)
