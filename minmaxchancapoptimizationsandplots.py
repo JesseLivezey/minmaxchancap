@@ -4,7 +4,7 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-from minimummaximumchannelcapacity import *
+from channel_capacity import *
 import numpy as np
 import random
 from scipy import optimize
@@ -32,9 +32,8 @@ def plot_min():
 	plt.imshow(minOutput, interpolation='nearest')#, cmap='viridis')
 	plt.colorbar()
 	plt.title('Minimum Capacity')
-	plt.show()
 
-#plot_min()
+plot_min()
 
 def plot_max():
 	plt.figure()
@@ -43,9 +42,9 @@ def plot_max():
 	plt.imshow(maxOutput, interpolation='nearest')#, cmap='viridis')
 	plt.colorbar()
 	plt.title('Maximum Capacity')
-	plt.show()
 
-#plot_max()
+plot_max()
+plt.show()
 
 '''The following program bounds minimum and maximum capacity 
 as a function of classification accuracy (r)'''

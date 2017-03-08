@@ -6,11 +6,13 @@
 
 #the following are functions used to test whether the chcap function works
 
-from minmaxchancapoptimizationsandplots import *
+#from minmaxchancapoptimizationsandplots import *
+from channel_capacity import (Initializer, calcPyh, chCapMin, chCapMax,
+                              con2, con3, con4)
 import numpy as np
 import numpy.matlib
 
-Pyhy_real_test = Pyhy
+#Pyhy_real_test = Pyhy
 
 Pyhy_con4_test = np.array([[0.6, 0.1, 0.3],
                            [0.4, 0.6, 0.3],
@@ -26,63 +28,68 @@ Pyhy_con2_test = np.array([[0.1, 0.8, 0.1],
 #the following function makes sure that for a 2darray of n x n dimensions...
 #an inputArray where the diagonal is all ones and everything else is 0 yields a channel capacity of logbase2(n)
 
-def chCapTestFunc(testArray):
-    Py = x*np.ones(float(n))
-    Pyhy_testi=np.ravel(testArray, order='C')
-    chCapTestMin = chCapMin(Pyhy_testi, r, n, Py)
-    chCapTestMax = chCapMax(Pyhy_testi, r, n, Py)
-    assert np.allclose(np.log2(n), chCapTestMin) # - - It Works!!
-    try:
-        assert np.allclose(np.log2(n), -chCapTestMax)
-    except AssertionError:
-        print(-chCapTestMax)
+def test_chCap_min_soln():
+    n = 5
+    r = None
+    Py = np.ones(n)/float(n)
+    Pyhy = np.ravel(np.eye(n), order='C')
 
-chCapTestFunc(np.matlib.identity(n, dtype='float'))
+    chCapTestMin = chCapMin(Pyhy, r, n, Py)
+    chCapTestMax = chCapMax(Pyhy, r, n, Py)
+
+    assert np.allclose(np.log2(n), chCapTestMin) # - - It Works!!
+    assert np.allclose(np.log2(n), -chCapTestMax)
+
 
 #the following function makes sure that for a 2darray of n x n dimensions...
 #an inputArray where every item is filled with ones yields a channel capacity of 0
 
-def chCapTestFunc2(testArray):
-    Py = x*np.ones(float(n))
-    chCapTest2 = 0.0
-    Pyhy_test2i=np.ravel(testArray, order='C')
-    chCapTestMin2 = chCapMin(Pyhy_test2i, r, n, Py)
-    chCapTestMax2 = chCapMax(Pyhy_test2i, r, n, Py)
-    assert np.allclose(0.0, chCapTestMin2, chCapTestMax2) # - - It Works!!
+def test_chCap_uniform():
+    n = 5
+    r = None
+    Py = np.ones(n)/float(n)
+    Pyhy = np.ones((n, n))/float(n)
 
-chCapTestFunc2(np.ones((n,n), dtype='float')) #also originally had a /n at the end?
+    chCapTestMin2 = chCapMin(Pyhy, r, n, Py)
+    chCapTestMax2 = chCapMax(Pyhy, r, n, Py)
+
+    assert np.allclose(0., chCapTestMin2) # - - It Works!!
+    assert np.allclose(0., chCapTestMax2) # - - It Works!!
 
 #This is the case where you are only inputting one type of class and so you still transmit no information.
 
-def chCapTestFunc3(testArray):
+def test_chCap_single_input():
+    n = 5
+    r = None
     Py = np.zeros(n)
     Py[0] = 1.0
-    chCapTest3 = 0.0
-    Pyhy_test3i=np.ravel(testArray, order='C')
-    chCapTestMin3 = chCapMin(Pyhy_test3i, r, n, Py)
-    chCapTestMax3 = chCapMax(Pyhy_test3i, r, n, Py)
-    assert np.allclose(0.0, chCapTestMin3, chCapTestMax3)
-    
-chCapTestFunc3(np.ones((n,n), dtype='float')) #originally had a /n at the end?
+    Pyhy_testi=np.ravel(np.eye(n), order='C')
 
-def con4TestFunc(testArray):
-    MatDif = 0.0
-    con4_test = np.ravel(testArray, order='C')
+    chCapTestMin3 = chCapMin(Pyhy_testi, r, n, Py)
+    chCapTestMax3 = chCapMax(Pyhy_testi, r, n, Py)
+
+    assert np.allclose(0.0, chCapTestMin3)
+    assert np.allclose(0.0, chCapTestMax3)
+    
+def test_con4():
+    n = 3
+    r = None
+    con4_test = np.ravel(Pyhy_con4_test, order='C')
     MatDif = con4(con4_test, r, n, Py)
     assert MatDif >= 0
 
-con4TestFunc(Pyhy_con4_test)
 
-def con3TestFunc(testArray):
-    con3_test = np.ravel(testArray, order='C')
+def test_con3():
+    n = 3
+    r = .15
+    con3_test = np.ravel(Pyhy_con3_test, order='C')
     ActError = con3(con3_test, r, n, Py)
     assert np.allclose(0.0, ActError)
-    
-con3TestFunc(Pyhy_con3_test)
 
-def con2TestFunc(testArray):
-    con2_test = np.ravel(testArray, order='C')
+
+def test_con2():
+    n = 3
+    r = None
+    con2_test = np.ravel(Pyhy_con2_test, order='C')
     MatSum = con2(con2_test, r, n, Py)
     assert np.allclose(0, MatSum)
-    
-con2TestFunc(Pyhy_con2_test)
