@@ -7,10 +7,10 @@
 #the following are functions used to test whether the chcap function works
 
 #from minmaxchancapoptimizationsandplots import *
-from channel_capacity import (Initializer, calcPyh, chCapMin, chCapMax,
-                              con2, con3, con4)
+from channel_capacity import (Initializer, Deriver, chCapMin, chCapMax,
+                              con2, con3, con4, test_c_Support, test_D_Support)
 import numpy as np
-import numpy.matlib
+import scipy.optimize
 
 #Pyhy_real_test = Pyhy
 
@@ -25,9 +25,21 @@ Pyhy_con3_test = np.array([[0.4, 0.3, 0.3],
 Pyhy_con2_test = np.array([[0.1, 0.8, 0.1],
                            [0.4, 0.6, 0.0],
                            [0.2, 0.5, 0.3]])
+
+#test the gradient vs. finite difference approximation
+def check_Deriver():
+    n = 3
+    r = 0.4
+    Py = np.ones(n)/float(n)
+    x0 = Initializer(r, n)
+    error = scipy.optimize.check_grad(test_c_Support, test_D_Support, [x0], r, n, Py)
+    print(error)
+
+check_Deriver()
+
+
 #the following function makes sure that for a 2darray of n x n dimensions...
 #an inputArray where the diagonal is all ones and everything else is 0 yields a channel capacity of logbase2(n)
-
 def test_chCap_min_soln():
     n = 5
     r = None
@@ -43,7 +55,6 @@ def test_chCap_min_soln():
 
 #the following function makes sure that for a 2darray of n x n dimensions...
 #an inputArray where every item is filled with ones yields a channel capacity of 0
-
 def test_chCap_uniform():
     n = 5
     r = None
@@ -57,7 +68,6 @@ def test_chCap_uniform():
     assert np.allclose(0., chCapTestMax2) # - - It Works!!
 
 #This is the case where you are only inputting one type of class and so you still transmit no information.
-
 def test_chCap_single_input():
     n = 5
     r = None

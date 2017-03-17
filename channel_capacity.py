@@ -25,14 +25,29 @@ def Deriver(inputArray, r, n, Py):
     dx = np.zeros((n,n))
     for i in range(n):
         for j in range(n):
-            try:
-                a = (Py[j] * math.log((Pyhy_i[i,j] / calcPyh(inputArray, n, Py)[i]), 10))
-                b = (1/math.log(10))
-                c = (1/math.log(10)) * (1/calcPyh(inputArray, n, Py)[i])
+                if calcPyh(inputArray, n, Py)[i] == 0.0:
+                    return "why"
+                a = (Py[j] * np.log2((Pyhy_i[i,j] / calcPyh(inputArray, n, Py)[i])))
+                b = (1/math.log(2))
+                c = (1/math.log(2)) * (1/calcPyh(inputArray, n, Py)[i])
                 dx[i,j] = a + b - c
-            except ValueError:
-                print("Test failed. Run Again.")
     return np.ravel(dx)
+
+def test_D_Support(wrappedArray, r, n, Py):
+    return np.average(Deriver(wrappedArray[0], r, n, Py));
+    """storage = []
+    for i in range(len(wrappedArray)):
+        testArray = wrappedArray[i]
+        storage.append(Deriver(testArray, r, n, Py))
+    return sum(storage) / len(wrappedArray)"""
+    
+def test_c_Support(wrappedArray, r, n, Py):
+    return chCapMin(wrappedArray[0], r, n, Py)
+    """storage = []
+    for i in range(len(wrappedArray)):
+        testArray = wrappedArray[i]
+        storage.append(chCapMin(testArray, r, n, Py))
+    return sum(storage) / len(wrappedArray)"""
             
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray, n, Py):
@@ -41,7 +56,7 @@ def calcPyh(inputArray, n, Py):
     return Pyh
 
 #calculate c given Pyhy, Py, Pyh using the formula for channel capacity (without the supremum)
-'''def chCapMin(inputArray, r, n, Py):
+def chCapMinIterative(inputArray, r, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
     chanCap = 0.0
     Pyh_i = calcPyh(Pyhy_i, n, Py)
@@ -58,7 +73,11 @@ def calcPyh(inputArray, n, Py):
                 d = float(inParen)
                 c = a*b*d
                 chanCap = chanCap + c
-    return chanCap'''
+    return chanCap
+
+def chCapMaxIterative(inputArray, r, n, Py):
+    return -chCapMinIterative(inputArray, r, n, Py)
+    
     
 def chCapMin(inputArray, r, n, Py):
     Pyhy_i = inputArray.reshape(n, n)
