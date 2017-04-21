@@ -33,22 +33,11 @@ def Deriver(inputArray, r, n, Py):
                 dx[i,j] = a + b - c
     return np.ravel(dx)
 
-def test_D_Support(wrappedArray, r, n, Py):
-    return np.average(Deriver(wrappedArray[0], r, n, Py));
-    """storage = []
-    for i in range(len(wrappedArray)):
-        testArray = wrappedArray[i]
-        storage.append(Deriver(testArray, r, n, Py))
-    return sum(storage) / len(wrappedArray)"""
+def FixedDeriver(inputArray, r, n, Py):
+    Pyhy_i = inputArray.reshape(n,n)
+    denom_sum = Pyhy_i.dot(Py)
+    return np.ravel(Py * np.log2(Pyhy_i / denom_sum))
     
-def test_c_Support(wrappedArray, r, n, Py):
-    return chCapMin(wrappedArray[0], r, n, Py)
-    """storage = []
-    for i in range(len(wrappedArray)):
-        testArray = wrappedArray[i]
-        storage.append(chCapMin(testArray, r, n, Py))
-    return sum(storage) / len(wrappedArray)"""
-            
 #Calculate Pyh[i] given n, Pyhy, and Py using the formula sigma(index j) P(Yhi|Yj)*P(Yj)
 def calcPyh(inputArray, n, Py):
     Pyhy_i = inputArray.reshape(n,n)
@@ -62,10 +51,7 @@ def chCapMinIterative(inputArray, r, n, Py):
     Pyh_i = calcPyh(Pyhy_i, n, Py)
     for i in range(n):
         for j in range(n):
-            try:
-                inParenPrimer = Pyhy_i[i,j]/Pyh_i[i]
-            except ZeroDivisionError:
-                pass 
+            inParenPrimer = Pyhy_i[i,j]/Pyh_i[i]
             if inParenPrimer > 0:
                 inParen = math.log(inParenPrimer, 2)
                 a = float(Pyhy_i[i,j])

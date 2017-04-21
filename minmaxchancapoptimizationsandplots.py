@@ -14,15 +14,15 @@ from matplotlib import pyplot as plt
 #Pyh[i] signifies the probability that an object is predicted to be in class i
 #Py[j] is the probability that a random object is from class j
 
-r = 0.22
-n = 5
+r = 0.4
+n = 3
 Pyhy = Initializer(r, n)
 Pyhy_in=np.ravel(Pyhy, order='C')
 Py = np.ones(float(n))/float(n)
 
 '''Add in additional arguments n, Py, to the "args" parameter in the optimize.fmin_slsqp functions below'''
-minimizePyhyfmin = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = Deriver, args=(r, n, Py))
-maximizePyhyfmin = optimize.fmin_slsqp(chCapMaxIterative, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = Deriver, args=(r, n, Py))
+minimizePyhyfmin = optimize.fmin_slsqp(chCapMinIterative, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = FixedDeriver, args=(r, n, Py))
+maximizePyhyfmin = optimize.fmin_slsqp(chCapMaxIterative, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], bounds = [(0, 1) for ii in range(n**2)], fprime = FixedDeriverMax, args=(r, n, Py))
 
 def plot_min():
 	plt.figure()
@@ -31,7 +31,6 @@ def plot_min():
 	plt.imshow(minOutput, interpolation='nearest')#, cmap='viridis')
 	plt.colorbar()
 	plt.title('Minimum Capacity')
-
 plot_min()
 
 def plot_max():
@@ -59,10 +58,10 @@ def bound_plot():
      for i in range(int(r*100), num):
          acc = i/100
          in_array.append(acc)
-         curr_max_func_value = optimize.fmin_slsqp(chCapMaxIterative, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
-         curr_min_func_value = optimize.fmin_slsqp(chCapMinIterative, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
-         out_array_min.append(chCapMinIterative(curr_min_func_value, acc, n, Py))
-         out_array_max.append(-chCapMaxIterative(curr_max_func_value, acc, n, Py))
+         curr_max_func_value = optimize.fmin_slsqp(chCapMax, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
+         curr_min_func_value = optimize.fmin_slsqp(chCapMin, Pyhy_in, eqcons=[con3, con2], ieqcons=[con4], args=(acc, n, Py), iprint=0, bounds = [(0, 1) for ii in range(n**2)])
+         out_array_min.append(chCapMin(curr_min_func_value, acc, n, Py))
+         out_array_max.append(-chCapMax(curr_max_func_value, acc, n, Py))
      plt.plot(in_array, out_array_min, "-", label="MinPlot")
      plt.plot(in_array, out_array_max, "-", label="MaxPlot")
 #     plt.title('Bound Minimum and Maximum')
@@ -102,7 +101,7 @@ def plot_all():
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0)
     plt.show()
 
-plot_all()
+#plot_all()
         
         
     

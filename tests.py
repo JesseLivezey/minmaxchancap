@@ -7,8 +7,8 @@
 #the following are functions used to test whether the chcap function works
 
 #from minmaxchancapoptimizationsandplots import *
-from channel_capacity import (Initializer, Deriver, chCapMin, chCapMax,
-                              con2, con3, con4, test_c_Support, test_D_Support)
+from channel_capacity import (chCapMinIterative, chCapMaxIterative, Initializer, Deriver, FixedDeriver, FixedDeriverMax, chCapMin, chCapMax,
+                              con2, con3, con4)
 import numpy as np
 import scipy.optimize
 
@@ -31,9 +31,13 @@ def check_Deriver():
     n = 3
     r = 0.4
     Py = np.ones(n)/float(n)
-    x0 = Initializer(r, n)
-    error = scipy.optimize.check_grad(test_c_Support, test_D_Support, [x0], r, n, Py)
-    print(error)
+    x0 = np.ravel(Initializer(r, n))
+    errorMin = scipy.optimize.check_grad(chCapMin, FixedDeriver, x0, r, n, Py)
+    errorMax = scipy.optimize.check_grad(chCapMax, FixedDeriverMax, x0, r, n, Py)
+    print(errorMin)
+    print(errorMax)
+    assert (errorMin > 0 and errorMin < 0.001)
+    assert (errorMax > 0 and errorMax < 0.001)
 
 check_Deriver()
 
